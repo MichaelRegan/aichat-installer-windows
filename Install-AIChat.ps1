@@ -437,14 +437,22 @@ function aichat {
         $finalArgs = $args
     }
     
-    # Call actual aichat and filter out <think> blocks
-    $output = & (Get-Command aichat.exe).Source @finalArgs | Out-String
-    
-    # Remove <think>...</think> blocks using regex
-    $filteredOutput = $output -replace '(?s)<think>.*?</think>\s*', ''
-    
-    # Output the filtered result (trim any leading/trailing whitespace)
-    $filteredOutput.Trim() | Write-Host
+    # Call actual aichat, capture output, and filter out <think> blocks
+    $originalEncoding = [Console]::OutputEncoding
+    try {
+        [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+        $output = & (Get-Command aichat.exe).Source @finalArgs 2>&1 | ForEach-Object { $_.ToString() }
+        
+        # Join output and remove <think> blocks
+        $joinedOutput = $output -join "`n"
+        $filteredOutput = $joinedOutput -replace '(?s)<think>.*?</think>\s*', ''
+        
+        # Output directly without extra processing
+        Write-Output $filteredOutput.Trim()
+    }
+    finally {
+        [Console]::OutputEncoding = $originalEncoding
+    }
 }
 '@
         

@@ -81,7 +81,7 @@ foreach ($disk in $disks) {
 }
 $diskInfo = $diskInfo.TrimEnd("`n")
 
-# Network adapters
+# Network adapters and IP addresses
 $adapters = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | Select-Object Name, InterfaceDescription, LinkSpeed
 $networkInfo = if ($adapters) {
     $netText = "Active adapters:`n"
@@ -95,6 +95,12 @@ $networkInfo = if ($adapters) {
 else {
     "No active adapters"
 }
+
+# Extract just IP addresses for easy reference
+$allIPs = Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue | 
+    Where-Object { $_.IPAddress -notmatch '^127\.|^169\.254\.' } | 
+    Select-Object -ExpandProperty IPAddress
+$ipAddresses = if ($allIPs) { $allIPs -join ", " } else { "none detected" }
 
 # Timezone and locale
 $timezone = (Get-TimeZone).DisplayName
@@ -131,18 +137,26 @@ $roleContent = @"
 # local
 
 ## init
-You are a direct, concise Windows system assistant.
+You are a direct, concise Windows system assistant with access to live system data below.
 
 CRITICAL RULES:
-- NEVER show <think> tags or reasoning process
-- NEVER explain your thought process  
-- Provide direct, actionable answers only
+- NEVER show <think> tags or reasoning process  
+- ALWAYS read and use the system context data below to answer questions
+- When asked "What is my IP address?" answer with the specific IPs from ip_addresses field
+- When asked about RAM, use the memory values from context
+- When asked about CPU, use the cpu name from context  
+- Provide EXACT values from the machine snapshot first, then verification commands
 - Use PowerShell examples by default
 - Include cmd.exe alternatives when useful
 
-## context (machine snapshot; parse as needed)
+EXAMPLES:
+- Q: "What is my IP address?" → A: "Your IP addresses are: [list from ip_addresses field]"
+- Q: "How much RAM?" → A: "You have [total_gb] GB RAM ([used_gb] GB used, [free_gb] GB free)"
+
+## context (machine snapshot; use this data to answer questions)
 ``````yaml
 # Generated: $timestamp
+# INSTRUCTION: Use the specific values below when answering system questions
 host: $hostname
 user: $username
 domain: $domain
@@ -173,6 +187,8 @@ disks: |
 
 networking: |
   $networkInfo
+
+ip_addresses: $ipAddresses
 
 runtime:
   current_directory: $currentDir

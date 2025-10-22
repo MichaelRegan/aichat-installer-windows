@@ -7,6 +7,7 @@ This installer automates the complete setup of aichat on Windows, including:
 - PowerShell profile integration with keybindings
 - Argument completion
 - Wrapper function with dynamic system context
+- Clean output filtering (removes AI thinking blocks)
 - Configuration file initialization
 
 ## Features
@@ -14,6 +15,7 @@ This installer automates the complete setup of aichat on Windows, including:
 ✅ **Automated Installation** - Uses `winget` for clean package management  
 ✅ **Shell Integration** - Adds `Alt+E` keybinding for inline command execution  
 ✅ **Smart Wrapper** - Injects live system context before each aichat invocation  
+✅ **Clean Output** - Automatically filters out AI thinking blocks for cleaner responses  
 ✅ **Argument Completion** - Tab completion for aichat commands and roles  
 ✅ **Dry-Run Mode** - Preview changes without modifying your system  
 ✅ **JSON Output** - Machine-readable installation plan for automation  
@@ -147,15 +149,29 @@ Register-ArgumentCompleter -CommandName aichat -ScriptBlock {
 
 ```powershell
 function aichat {
-    $rolePath = "$env:APPDATA\aichat\roles\local.md"
-    if (-not (Test-Path $rolePath)) {
-        & "$PSScriptRoot\scripts\New-AIChatRole.ps1"
+    # Refresh system context
+    $roleScript = Join-Path $env:USERPROFILE ".local\bin\New-AIChatRole.ps1"
+    if (Test-Path $roleScript) {
+        & $roleScript -ErrorAction SilentlyContinue | Out-Null
     }
-    & (Get-Command -Name aichat.exe -CommandType Application).Source @args
+    
+    # Auto-apply local role if no role specified
+    $hasRoleArg = $false
+    for ($i = 0; $i -lt $args.Count; $i++) {
+        if ($args[$i] -eq '-r' -or $args[$i] -eq '--role') {
+            $hasRoleArg = $true; break
+        }
+    }
+    
+    $finalArgs = if (-not $hasRoleArg) { @('-r', 'local') + $args } else { $args }
+    
+    # Execute aichat and filter out thinking blocks
+    $output = & (Get-Command aichat.exe).Source @finalArgs | Out-String
+    ($output -replace '(?s)<think>.*?</think>\s*', '').Trim() | Write-Host
 }
 ```
 
-The wrapper ensures the `local` role has current system context before each run.
+The wrapper ensures the `local` role has current system context before each run and provides clean output by filtering AI thinking blocks.
 
 ### 5. Role Generator Script (Optional)
 **Location:** `%APPDATA%\aichat\scripts\New-AIChatRole.ps1`

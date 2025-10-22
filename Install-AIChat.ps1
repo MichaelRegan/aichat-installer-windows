@@ -437,8 +437,14 @@ function aichat {
         $finalArgs = $args
     }
     
-    # Call actual aichat with final arguments
-    & (Get-Command aichat.exe).Source @finalArgs
+    # Call actual aichat and filter out <think> blocks
+    $output = & (Get-Command aichat.exe).Source @finalArgs | Out-String
+    
+    # Remove <think>...</think> blocks using regex
+    $filteredOutput = $output -replace '(?s)<think>.*?</think>\s*', ''
+    
+    # Output the filtered result (trim any leading/trailing whitespace)
+    $filteredOutput.Trim() | Write-Host
 }
 '@
         

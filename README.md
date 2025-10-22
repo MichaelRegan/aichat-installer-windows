@@ -32,7 +32,7 @@ This installer automates the complete setup of aichat on Windows, including:
 **Option 1: Direct execution**
 ```powershell
 # Download and run (review script first!)
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/YOUR_USERNAME/aichat-installer-windows/main/Install-AIChat.ps1" -OutFile "$env:TEMP\Install-AIChat.ps1"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/michaelregan/aichat-installer-windows/main/Install-AIChat.ps1" -OutFile "$env:TEMP\Install-AIChat.ps1"
 & "$env:TEMP\Install-AIChat.ps1"
 ```
 
@@ -350,12 +350,12 @@ MIT License - See LICENSE file for details
 ## Related Projects
 
 - **aichat** - https://github.com/sigoden/aichat
-- **Linux Installer** - https://github.com/YOUR_USERNAME/install-aichat
+- **Linux Installer** - https://github.com/sigoden/aichat (official installer)
 
 ## Support
 
-- **Issues:** https://github.com/YOUR_USERNAME/aichat-installer-windows/issues
-- **Discussions:** https://github.com/YOUR_USERNAME/aichat-installer-windows/discussions
+- **Issues:** https://github.com/michaelregan/aichat-installer-windows/issues
+- **Discussions:** https://github.com/michaelregan/aichat-installer-windows/discussions
 - **AIChat Docs:** https://github.com/sigoden/aichat/wiki
 
 ---

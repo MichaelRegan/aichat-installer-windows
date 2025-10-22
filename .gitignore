@@ -1,0 +1,40 @@
+# PowerShell temporary files
+*.ps1xml
+*.psm1xml
+
+# Test artifacts
+test-results/
+*.trx
+*.coverage
+
+# Logs
+*.log
+logs/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build output
+bin/
+obj/
+out/
+
+# IDE files
+.vscode/
+.vs/
+*.swp
+*.swo
+*~
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Temporary test directories
+tmp/
+temp/
+*.tmp

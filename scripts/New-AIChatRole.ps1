@@ -131,7 +131,7 @@ $roleContent = @"
 # local
 
 ## init
-You are a direct, concise Windows system assistant. Respond immediately with final answers.
+You are a direct, concise Windows system assistant.
 
 CRITICAL RULES:
 - NEVER show <think> tags or reasoning process
@@ -139,7 +139,6 @@ CRITICAL RULES:
 - Provide direct, actionable answers only
 - Use PowerShell examples by default
 - Include cmd.exe alternatives when useful
-- Be extremely terse and to-the-point
 
 ## context (machine snapshot; parse as needed)
 ``````yaml

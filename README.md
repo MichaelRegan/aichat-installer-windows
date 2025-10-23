@@ -287,6 +287,14 @@ Test-Path "$env:USERPROFILE\.local\bin\New-AIChatRole.ps1"
 Get-Content "$env:APPDATA\aichat\roles\local.md"
 ```
 
+### Issue: Role generator not working after installation
+**Solution:** Use the diagnostic script:
+```powershell
+# Download and run role diagnostics
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/michaelregan/aichat-installer-windows/main/scripts/Test-AIChatRole.ps1" -OutFile "$env:TEMP\Test-AIChatRole.ps1"
+& "$env:TEMP\Test-AIChatRole.ps1"
+```
+
 ## Testing
 
 Run the included test suite:
@@ -341,7 +349,8 @@ Failed: 0
 aichat-installer-windows/
 ├── Install-AIChat.ps1         # Main installer script
 ├── scripts/
-│   └── New-AIChatRole.ps1     # Role generator (gathers system info)
+│   ├── New-AIChatRole.ps1     # Role generator (gathers system info)
+│   └── Test-AIChatRole.ps1    # Role diagnostics (troubleshooting)
 ├── tests/
 │   └── Test-Installer.ps1     # Test suite
 ├── docs/

@@ -174,7 +174,7 @@ function aichat {
 The wrapper ensures the `local` role has current system context before each run and provides clean output by filtering AI thinking blocks.
 
 ### 5. Role Generator Script (Optional)
-**Location:** `%APPDATA%\aichat\scripts\New-AIChatRole.ps1`
+**Location:** `%USERPROFILE%\.local\bin\New-AIChatRole.ps1`
 
 Generates `local.md` role with:
 - Hostname, username, domain
@@ -277,13 +277,13 @@ Start-Process powershell -Verb RunAs -ArgumentList "-File Install-AIChat.ps1"
 ### Issue: Wrapper function not calling role generator
 **Solution:** Verify script path:
 ```powershell
-Test-Path "$env:APPDATA\aichat\scripts\New-AIChatRole.ps1"
+Test-Path "$env:USERPROFILE\.local\bin\New-AIChatRole.ps1"
 ```
 
 ### Issue: Role generator fails silently
 **Solution:** Run manually to see errors:
 ```powershell
-& "$env:APPDATA\aichat\scripts\New-AIChatRole.ps1"
+& "$env:USERPROFILE\.local\bin\New-AIChatRole.ps1"
 Get-Content "$env:APPDATA\aichat\roles\local.md"
 ```
 

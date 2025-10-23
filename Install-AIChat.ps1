@@ -441,7 +441,19 @@ function aichat {
     $originalEncoding = [Console]::OutputEncoding
     try {
         [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-        $output = & (Get-Command aichat.exe).Source @finalArgs 2>&1 | ForEach-Object { $_.ToString() }
+        
+        # Find aichat command (try aichat.exe first, then aichat)
+        $aichatCmd = Get-Command aichat.exe -ErrorAction SilentlyContinue
+        if (-not $aichatCmd) {
+            $aichatCmd = Get-Command aichat -ErrorAction SilentlyContinue
+        }
+        
+        if (-not $aichatCmd) {
+            Write-Error "aichat command not found. Please install aichat first."
+            return
+        }
+        
+        $output = & $aichatCmd.Source @finalArgs 2>&1 | ForEach-Object { $_.ToString() }
         
         # Join output and remove <think> blocks
         $joinedOutput = $output -join "`n"

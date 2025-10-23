@@ -166,7 +166,11 @@ function aichat {
     $finalArgs = if (-not $hasRoleArg) { @('-r', 'local') + $args } else { $args }
     
     # Execute aichat and filter out thinking blocks
-    $output = & (Get-Command aichat.exe).Source @finalArgs | Out-String
+    $aichatCmd = Get-Command aichat.exe -ErrorAction SilentlyContinue
+    if (-not $aichatCmd) { $aichatCmd = Get-Command aichat -ErrorAction SilentlyContinue }
+    if (-not $aichatCmd) { Write-Error "aichat not found"; return }
+    
+    $output = & $aichatCmd.Source @finalArgs | Out-String
     ($output -replace '(?s)<think>.*?</think>\s*', '').Trim() | Write-Host
 }
 ```

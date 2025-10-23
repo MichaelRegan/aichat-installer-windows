@@ -377,27 +377,43 @@ function Main {
     
     # Install role generator
     if (-not $SkipRole) {
+        Write-Status "Installing role generator..." "🧩"
+        $installPath = Join-Path $env:USERPROFILE ".local\bin"
+        if (-not (Test-Path $installPath)) {
+            New-Item -Path $installPath -ItemType Directory -Force | Out-Null
+        }
+        
+        $roleScriptDestination = Join-Path $installPath "New-AIChatRole.ps1"
+        
+        # Try local script first (for cloned repo), then download from GitHub
         $roleScriptPath = Join-Path $PSScriptRoot "scripts\New-AIChatRole.ps1"
         if (Test-Path $roleScriptPath) {
-            Write-Status "Installing role generator..." "🧩"
-            $installPath = Join-Path $env:USERPROFILE ".local\bin"
-            if (-not (Test-Path $installPath)) {
-                New-Item -Path $installPath -ItemType Directory -Force | Out-Null
-            }
-            Copy-Item $roleScriptPath -Destination (Join-Path $installPath "New-AIChatRole.ps1") -Force
-            Write-Success "Role generator installed to: $(Join-Path $installPath 'New-AIChatRole.ps1')"
-            
-            # Generate initial role
-            try {
-                & (Join-Path $installPath "New-AIChatRole.ps1") -ErrorAction SilentlyContinue
-                Write-Success "Initial local role generated"
-            }
-            catch {
-                Write-Warning2 "Could not generate initial role (will be created on first run)"
-            }
+            # Local script exists (cloned repo)
+            Copy-Item $roleScriptPath -Destination $roleScriptDestination -Force
+            Write-Success "Role generator installed from local script"
         }
         else {
-            Write-Warning2 "Role generator script not found at: $roleScriptPath"
+            # Download from GitHub (direct installer download)
+            try {
+                Write-Status "Downloading role generator from GitHub..." "📥"
+                $roleScriptUrl = "https://raw.githubusercontent.com/michaelregan/aichat-installer-windows/main/scripts/New-AIChatRole.ps1"
+                Invoke-WebRequest -Uri $roleScriptUrl -OutFile $roleScriptDestination -UseBasicParsing
+                Write-Success "Role generator downloaded and installed"
+            }
+            catch {
+                Write-Warning2 "Failed to download role generator: $($_.Exception.Message)"
+                Write-Warning2 "Role generator will not be available"
+                return
+            }
+        }
+        
+        # Generate initial role
+        try {
+            & $roleScriptDestination -ErrorAction SilentlyContinue
+            Write-Success "Initial local role generated"
+        }
+        catch {
+            Write-Warning2 "Could not generate initial role (will be created on first run)"
         }
     }
     

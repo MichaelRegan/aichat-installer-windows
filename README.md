@@ -96,6 +96,8 @@ cd aichat-installer-windows
 
 ## What Gets Installed
 
+**Note:** When using Option 1 (direct download), the installer automatically downloads the role generator script from GitHub. When using Option 2 (cloned repository), it uses the local script files. Both methods result in the same installation.
+
 ### 1. AIChat Binary
 - Installed via `winget install --id sigoden.aichat`
 - Typically places `aichat.exe` in `%LOCALAPPDATA%\Microsoft\WinGet\Packages\`
@@ -180,16 +182,20 @@ The wrapper ensures the `local` role has current system context before each run 
 ### 5. Role Generator Script (Optional)
 **Location:** `%USERPROFILE%\.local\bin\New-AIChatRole.ps1`
 
-Generates `local.md` role with:
+**Installation:** Automatically downloaded from GitHub during installation (or copied from local `scripts/` if repository is cloned).
+
+Generates `local.md` role with live system information:
 - Hostname, username, domain
 - OS version, build, architecture
 - CPU specs (cores, clock speed)
 - GPU details (name, VRAM, drivers)
 - Memory usage (total, used, free)
 - Disk information (drives, space)
-- Active network adapters
+- Active network adapters and IP addresses
 - PowerShell version
 - Timezone and locale
+
+The role file is regenerated before each aichat invocation to ensure current system state.
 
 ## Configuration
 
